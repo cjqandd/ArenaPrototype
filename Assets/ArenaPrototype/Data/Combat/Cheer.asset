@@ -1,0 +1,39 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 873a4f78ec92d6b4996851db574ee857, type: 3}
+  m_Name: Cheer
+  m_EditorClassIdentifier: Assembly-CSharp::ArenaPrototype.Combat.CheerDefinition
+  maximumCheer: 100
+  levelOneThreshold: 0.25
+  levelTwoThreshold: 0.55
+  levelThreeThreshold: 0.85
+  bodyHitBaseGain: 4
+  healthDamageGainRate: 0.35
+  postureDamageGainRate: 0.08
+  postureBreakBonus: 8
+  defeatBonus: 10
+  shieldHitBaseGain: 3.5
+  shieldPostureGainRate: 0.06
+  shieldBreakBonus: 6
+  shieldGainAtLevelOne: 0.65
+  shieldGainAtLevelTwo: 0.35
+  shieldGainAtLevelThree: 0.15
+  hitBaseLoss: 8
+  healthDamageLossRate: 0.4
+  inactivityGraceDuration: 4
+  inactivityLossPerSecond: 8
+  healthDamageAtLevelOne: 1.05
+  healthDamageAtLevelTwo: 1.1
+  healthDamageAtLevelThree: 1.18
+  postureDamageAtLevelOne: 1.05
+  postureDamageAtLevelTwo: 1.1
+  postureDamageAtLevelThree: 1.15

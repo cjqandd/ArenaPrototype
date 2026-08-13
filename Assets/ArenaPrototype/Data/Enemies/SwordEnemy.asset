@@ -1,0 +1,31 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a5aa67531ec445043ab9fd8e77b18c6d, type: 3}
+  m_Name: SwordEnemy
+  m_EditorClassIdentifier: Assembly-CSharp::ArenaPrototype.Enemies.SwordEnemyDefinition
+  maxHealth: 100
+  maxPosture: 100
+  brokenDuration: 2.5
+  brokenDamageMultiplier: 1.5
+  brokenKnockbackMultiplier: 1.35
+  moveSpeed: 3.2
+  rotationSpeed: 540
+  knockbackDamping: 18
+  healthDamage: 18
+  postureDamage: 0
+  knockbackSpeed: 4.5
+  attackRange: 1.8
+  attackArcDegrees: 70
+  windupDuration: 0.55
+  activeDuration: 0.12
+  recoveryDuration: 0.65
+  respawnDelay: 1.5

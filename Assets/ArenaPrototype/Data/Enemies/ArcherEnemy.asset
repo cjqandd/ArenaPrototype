@@ -1,0 +1,33 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ad4350f4415611d41852f320e4cf9b50, type: 3}
+  m_Name: ArcherEnemy
+  m_EditorClassIdentifier: Assembly-CSharp::ArenaPrototype.Enemies.ArcherEnemyDefinition
+  maxHealth: 70
+  maxPosture: 70
+  brokenDuration: 2.5
+  brokenDamageMultiplier: 1.5
+  brokenKnockbackMultiplier: 1.35
+  moveSpeed: 2.8
+  rotationSpeed: 540
+  knockbackDamping: 18
+  retreatRange: 3.2
+  preferredRange: 5.8
+  maximumAttackRange: 8
+  healthDamage: 14
+  knockbackSpeed: 3.2
+  windupDuration: 0.8
+  recoveryDuration: 1.15
+  projectileSpeed: 13
+  projectileLifetime: 2.5
+  projectileHitRadius: 0.1
+  respawnDelay: 1.5

@@ -1,0 +1,15 @@
+Status=SuccessWithWarnings
+UnityVersion=6000.3.21f1
+RenderPipeline=Universal Render Pipeline
+CharacterModels=6
+CharacterPrefabs=6
+WeaponPrefabs=5
+GeneralAnimationClips=15
+MovementAnimationClips=11
+HumanoidAvatars=Valid
+HandSockets=Valid
+AnimationCurveFiniteValidation=Passed
+RootMotion=False
+GameplayIntegration=False
+SceneChanges=False
+Warning=Rig_Medium_General.fbx causes Unity 6 FBX importer IsFinite assertions while processing source curves. Imported animation clips contain no non-finite time/value keys, but animation playback still requires visual inspection before use.

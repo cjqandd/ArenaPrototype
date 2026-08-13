@@ -1,0 +1,14 @@
+Status=Success
+UnityVersion=6000.3.21f1
+ArtCatalog=Assets/ArenaPrototype/Data/Art/ArenaArtCatalog.asset
+Player=PFB_Player_A (Barbarian)
+Swordsman=PFB_Enemy_Swordsman_A (Rogue)
+Archer=PFB_Enemy_Archer_A (Ranger)
+ShieldBearer=PFB_Enemy_Shield_A (Knight)
+Scene=Assets/ArenaPrototype/Scenes/GrayboxArena.unity
+ProductionCharacterInstances=8
+RootMotion=False
+Locomotion=Idle_A + Walking_A + Running_A
+GameplayValuesChanged=False
+HitDetectionChanged=False
+WeaponsReplaced=False
