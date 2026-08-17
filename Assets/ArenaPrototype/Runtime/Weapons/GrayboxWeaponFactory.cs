@@ -1,4 +1,5 @@
 using ArenaPrototype.Combat;
+using ArenaPrototype.Art;
 using UnityEngine;
 
 namespace ArenaPrototype.Weapons
@@ -11,13 +12,29 @@ namespace ArenaPrototype.Weapons
             Quaternion rotation,
             WeaponDefinition definition,
             Material weaponMaterial,
-            Material pickupIndicatorMaterial)
+            Material pickupIndicatorMaterial,
+            ArenaArtCatalog artCatalog = null)
         {
             GameObject root = new GameObject(name);
             root.transform.SetPositionAndRotation(position, rotation);
 
+            ArenaEquipmentRole visualRole = definition.Kind == WeaponKind.ChainBlade
+                ? ArenaEquipmentRole.ChainBlade
+                : ArenaEquipmentRole.Sword;
+            EquipmentVisualProfile visualProfile = artCatalog != null
+                ? artCatalog.GetEquipmentProfile(visualRole)
+                : null;
+
             BoxCollider interactionCollider = root.AddComponent<BoxCollider>();
-            ConfigureInteractionCollider(interactionCollider, definition.Kind);
+            if (visualProfile != null)
+            {
+                interactionCollider.center = visualProfile.InteractionColliderCenter;
+                interactionCollider.size = visualProfile.InteractionColliderSize;
+            }
+            else
+            {
+                ConfigureInteractionCollider(interactionCollider, definition.Kind);
+            }
             interactionCollider.isTrigger = true;
 
             Rigidbody weaponRigidbody = root.AddComponent<Rigidbody>();
@@ -29,11 +46,15 @@ namespace ArenaPrototype.Weapons
 
             GameObject modelRoot = new GameObject("Model");
             modelRoot.transform.SetParent(root.transform, false);
-            if (definition.Kind == WeaponKind.ChainBlade)
+            EquipmentVisual productionVisual = ArenaVisualFactory.PopulateGroundedModel(
+                visualRole,
+                visualProfile,
+                modelRoot.transform);
+            if (productionVisual == null && definition.Kind == WeaponKind.ChainBlade)
             {
                 CreateChainBladeModel(modelRoot.transform, weaponMaterial);
             }
-            else
+            else if (productionVisual == null)
             {
                 CreateSwordModel(modelRoot.transform, weaponMaterial);
             }
@@ -53,6 +74,12 @@ namespace ArenaPrototype.Weapons
                 indicator,
                 interactionCollider,
                 weaponRigidbody);
+            if (visualProfile != null)
+            {
+                weapon.ConfigureEquippedPose(
+                    visualProfile.EquippedLocalPosition,
+                    visualProfile.EquippedLocalEuler);
+            }
             return weapon;
         }
 

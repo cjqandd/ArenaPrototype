@@ -1,5 +1,6 @@
 using ArenaPrototype.Combat;
 using ArenaPrototype.Enemies;
+using ArenaPrototype.Art;
 using UnityEngine;
 
 namespace ArenaPrototype.Weapons
@@ -11,6 +12,7 @@ namespace ArenaPrototype.Weapons
         [SerializeField] private Material weaponMaterial;
         [SerializeField] private Material pickupIndicatorMaterial;
         [SerializeField] private WeaponDropRegistry registry;
+        [SerializeField] private ArenaArtCatalog artCatalog;
         [SerializeField, Min(0f)] private float pickupLockDuration = 0.35f;
 
         public void Configure(
@@ -18,13 +20,15 @@ namespace ArenaPrototype.Weapons
             WeaponDefinition newWeaponDefinition,
             Material newWeaponMaterial,
             Material newPickupIndicatorMaterial,
-            WeaponDropRegistry newRegistry)
+            WeaponDropRegistry newRegistry,
+            ArenaArtCatalog newArtCatalog)
         {
             waveMember = newWaveMember;
             weaponDefinition = newWeaponDefinition;
             weaponMaterial = newWeaponMaterial;
             pickupIndicatorMaterial = newPickupIndicatorMaterial;
             registry = newRegistry;
+            artCatalog = newArtCatalog;
         }
 
         private void OnEnable()
@@ -58,7 +62,8 @@ namespace ArenaPrototype.Weapons
                 Quaternion.Euler(0f, transform.eulerAngles.y + 90f, 0f),
                 weaponDefinition,
                 weaponMaterial,
-                pickupIndicatorMaterial);
+                pickupIndicatorMaterial,
+                artCatalog);
             drop.Drop(dropPosition, drop.transform.rotation, pickupLockDuration);
             registry.Register(drop);
         }

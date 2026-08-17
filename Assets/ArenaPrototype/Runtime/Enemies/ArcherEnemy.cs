@@ -28,6 +28,7 @@ namespace ArenaPrototype.Enemies
         [SerializeField] private WorldSpaceDebugBars debugBars;
         [SerializeField] private LineRenderer aimTelegraph;
         [SerializeField] private Material projectileMaterial;
+        [SerializeField] private EquipmentVisualProfile projectileVisualProfile;
         [SerializeField] private EnemyWaveMember waveMember;
         [SerializeField] private EnemyAttackCoordinator attackCoordinator;
 
@@ -54,6 +55,7 @@ namespace ArenaPrototype.Enemies
             WorldSpaceDebugBars newDebugBars,
             LineRenderer newAimTelegraph,
             Material newProjectileMaterial,
+            EquipmentVisualProfile newProjectileVisualProfile,
             EnemyWaveMember newWaveMember)
         {
             definition = newDefinition;
@@ -65,6 +67,7 @@ namespace ArenaPrototype.Enemies
             debugBars = newDebugBars;
             aimTelegraph = newAimTelegraph;
             projectileMaterial = newProjectileMaterial;
+            projectileVisualProfile = newProjectileVisualProfile;
             waveMember = newWaveMember;
         }
 
@@ -210,6 +213,7 @@ namespace ArenaPrototype.Enemies
                 muzzle.position,
                 shotDirection,
                 projectileMaterial,
+                projectileVisualProfile,
                 gameObject,
                 definition.ProjectileSpeed * difficultyMultiplier,
                 definition.ProjectileLifetime,

@@ -161,6 +161,12 @@ namespace ArenaPrototype.Weapons
             ApplyStatePhysics();
         }
 
+        public void ConfigureEquippedPose(Vector3 localPosition, Vector3 localEuler)
+        {
+            equippedLocalPosition = localPosition;
+            equippedLocalEuler = localEuler;
+        }
+
         private void ApplyStatePhysics()
         {
             if (interactionCollider == null || weaponRigidbody == null)
@@ -174,10 +180,13 @@ namespace ArenaPrototype.Weapons
                     interactionCollider.enabled = false;
                     weaponRigidbody.interpolation = RigidbodyInterpolation.None;
                     weaponRigidbody.useGravity = false;
+                    if (!weaponRigidbody.isKinematic)
+                    {
+                        weaponRigidbody.linearVelocity = Vector3.zero;
+                        weaponRigidbody.angularVelocity = Vector3.zero;
+                    }
                     weaponRigidbody.isKinematic = true;
                     weaponRigidbody.detectCollisions = false;
-                    weaponRigidbody.linearVelocity = Vector3.zero;
-                    weaponRigidbody.angularVelocity = Vector3.zero;
                     break;
                 case WeaponState.Grounded:
                     SetGroundPhysics();
@@ -204,10 +213,13 @@ namespace ArenaPrototype.Weapons
             interactionCollider.isTrigger = true;
             weaponRigidbody.interpolation = RigidbodyInterpolation.None;
             weaponRigidbody.useGravity = false;
+            if (!weaponRigidbody.isKinematic)
+            {
+                weaponRigidbody.linearVelocity = Vector3.zero;
+                weaponRigidbody.angularVelocity = Vector3.zero;
+            }
             weaponRigidbody.isKinematic = true;
             weaponRigidbody.detectCollisions = true;
-            weaponRigidbody.linearVelocity = Vector3.zero;
-            weaponRigidbody.angularVelocity = Vector3.zero;
         }
 
         private void CaptureGroundedModelPose()

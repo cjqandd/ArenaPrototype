@@ -1,0 +1,10 @@
+Status=Success
+UnityVersion=6000.3.21f1
+Catalog=Assets/ArenaPrototype/Data/Art/ArenaArtCatalog.asset
+ActiveSet=Assets/ArenaPrototype/Data/Art/Sets/ARTSET_KayKit_Adventurers.asset
+FallbackSet=Assets/ArenaPrototype/Data/Art/Sets/ARTSET_Graybox.asset
+Characters=Player,Swordsman,Archer,ShieldBearer
+Equipment=Sword,Bow,Arrow,Shield
+ChainBladeFallback=Graybox
+GameplayValuesChanged=False
+HitDetectionChanged=False

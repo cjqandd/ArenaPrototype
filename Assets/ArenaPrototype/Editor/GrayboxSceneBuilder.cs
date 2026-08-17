@@ -93,6 +93,14 @@ namespace ArenaPrototype.Editor
             SpikeWallDefinition spikeWallDefinition = GetOrCreateSpikeWallDefinition();
             Scene scene = EditorSceneManager.NewScene(NewSceneSetup.EmptyScene, NewSceneMode.Single);
 
+            // Creating a new scene can invalidate asset references while the editor is importing.
+            // Resolve the canonical catalog after the scene switch, immediately before visual setup.
+            ArenaArtCatalog savedCatalog = AssetDatabase.LoadAssetAtPath<ArenaArtCatalog>(ArtCatalogPath);
+            if (savedCatalog != null)
+            {
+                artCatalog = savedCatalog;
+            }
+
             GameObject environment = new GameObject("Environment");
             CreateCube("Floor", environment.transform, new Vector3(0f, -0.25f, 0f), new Vector3(24f, 0.5f, 18f), floorMaterial);
             CreateCube("Wall_North", environment.transform, new Vector3(0f, 1f, 9.25f), new Vector3(24.5f, 2.5f, 0.5f), wallMaterial);
@@ -131,12 +139,15 @@ namespace ArenaPrototype.Editor
             Object.DestroyImmediate(facingMarker.GetComponent<Collider>());
             facingMarker.GetComponent<Renderer>().sharedMaterial = facingMaterial;
 
-            GameObject weaponPivot = new GameObject("WeaponPivot");
-            weaponPivot.transform.SetParent(player.transform, false);
-            weaponPivot.transform.localPosition = new Vector3(0f, 1f, 0f);
+            Transform weaponPivot = ArenaVisualFactory.CreateEquipmentPivot(
+                "WeaponPivot",
+                playerVisual,
+                player.transform,
+                false,
+                new Vector3(0f, 1f, 0f));
 
             PlayerMeleeCombat meleeCombat = player.AddComponent<PlayerMeleeCombat>();
-            meleeCombat.Configure(swordDefinition, weaponPivot.transform);
+            meleeCombat.Configure(swordDefinition, weaponPivot);
 
             GameObject kickVisual = GameObject.CreatePrimitive(PrimitiveType.Cube);
             kickVisual.name = "KickVisual";
@@ -157,7 +168,7 @@ namespace ArenaPrototype.Editor
             kickCombat.SetDodge(playerDodge);
 
             PlayerWeaponEquipment weaponEquipment = player.AddComponent<PlayerWeaponEquipment>();
-            weaponEquipment.Configure(weaponPivot.transform, meleeCombat, kickCombat, playerDodge);
+            weaponEquipment.Configure(weaponPivot, meleeCombat, kickCombat, playerDodge);
 
             WeaponInstance startingSword = GrayboxWeaponFactory.Create(
                 "PlayerSword",
@@ -165,7 +176,8 @@ namespace ArenaPrototype.Editor
                 Quaternion.identity,
                 swordDefinition,
                 weaponMaterial,
-                pickupIndicatorMaterial);
+                pickupIndicatorMaterial,
+                artCatalog);
             weaponEquipment.EquipInitial(startingSword);
 
             GrayboxWeaponFactory.Create(
@@ -174,7 +186,8 @@ namespace ArenaPrototype.Editor
                 Quaternion.Euler(0f, 90f, 0f),
                 chainBladeDefinition,
                 chainBladeMaterial,
-                pickupIndicatorMaterial);
+                pickupIndicatorMaterial,
+                artCatalog);
 
             PlayerHealth playerHealth = player.AddComponent<PlayerHealth>();
             playerHealth.Configure(
@@ -293,7 +306,7 @@ namespace ArenaPrototype.Editor
                 healthBarMaterial,
                 postureBarMaterial,
                 true);
-            AddShieldToSwordEnemy(wave2SwordB, shieldDefinition, shieldMaterial);
+            AddShieldToSwordEnemy(wave2SwordB, shieldDefinition, shieldMaterial, artCatalog);
 
             EnemyWaveMember wave3SwordA = CreateSwordEnemy(
                 "SwordEnemy_W3_A",
@@ -325,7 +338,7 @@ namespace ArenaPrototype.Editor
                 healthBarMaterial,
                 postureBarMaterial,
                 true);
-            AddShieldToSwordEnemy(wave3SwordB, shieldDefinition, shieldMaterial);
+            AddShieldToSwordEnemy(wave3SwordB, shieldDefinition, shieldMaterial, artCatalog);
             EnemyWaveMember wave3Archer = CreateArcherEnemy(
                 "ArcherEnemy_W3",
                 3,
@@ -363,31 +376,36 @@ namespace ArenaPrototype.Editor
                 swordDefinition,
                 weaponMaterial,
                 pickupIndicatorMaterial,
-                weaponDropRegistry);
+                weaponDropRegistry,
+                artCatalog);
             AddEnemyWeaponDrop(
                 wave2SwordA,
                 swordDefinition,
                 weaponMaterial,
                 pickupIndicatorMaterial,
-                weaponDropRegistry);
+                weaponDropRegistry,
+                artCatalog);
             AddEnemyWeaponDrop(
                 wave2SwordB,
                 swordDefinition,
                 weaponMaterial,
                 pickupIndicatorMaterial,
-                weaponDropRegistry);
+                weaponDropRegistry,
+                artCatalog);
             AddEnemyWeaponDrop(
                 wave3SwordA,
                 swordDefinition,
                 weaponMaterial,
                 pickupIndicatorMaterial,
-                weaponDropRegistry);
+                weaponDropRegistry,
+                artCatalog);
             AddEnemyWeaponDrop(
                 wave3SwordB,
                 swordDefinition,
                 weaponMaterial,
                 pickupIndicatorMaterial,
-                weaponDropRegistry);
+                weaponDropRegistry,
+                artCatalog);
 
             GameObject encounterObject = new GameObject("ArenaEncounterController");
             ArenaEncounterController encounter = encounterObject.AddComponent<ArenaEncounterController>();
@@ -460,7 +478,8 @@ namespace ArenaPrototype.Editor
             GameObject visualPrefab = artCatalog != null
                 ? artCatalog.GetCharacterPrefab(role)
                 : null;
-            if (visualPrefab == null)
+            bool useLegacyRolePrefab = artCatalog == null || artCatalog.ActiveArtSet == null;
+            if (visualPrefab == null && useLegacyRolePrefab)
             {
                 visualPrefab = AssetDatabase.LoadAssetAtPath<GameObject>(GetRoleCharacterPrefabPath(role));
             }
@@ -823,18 +842,29 @@ namespace ArenaPrototype.Editor
             Object.DestroyImmediate(facingMarker.GetComponent<Collider>());
             facingMarker.GetComponent<Renderer>().sharedMaterial = weaponMaterial;
 
-            GameObject weaponPivot = new GameObject("WeaponPivot");
-            weaponPivot.transform.SetParent(enemy.transform, false);
-            weaponPivot.transform.localPosition = new Vector3(0f, 1f, 0f);
+            Transform weaponPivot = ArenaVisualFactory.CreateEquipmentPivot(
+                "WeaponPivot",
+                characterVisual,
+                enemy.transform,
+                false,
+                new Vector3(0f, 1f, 0f));
 
-            GameObject sword = GameObject.CreatePrimitive(PrimitiveType.Cube);
-            sword.name = "Sword";
-            sword.transform.SetParent(weaponPivot.transform, false);
-            sword.transform.localPosition = new Vector3(0.62f, 0f, 0.50f);
-            sword.transform.localRotation = Quaternion.Euler(0f, 25f, 0f);
-            sword.transform.localScale = new Vector3(0.12f, 0.12f, 1.35f);
-            Object.DestroyImmediate(sword.GetComponent<Collider>());
-            sword.GetComponent<Renderer>().sharedMaterial = weaponMaterial;
+            EquipmentVisual swordVisual = ArenaVisualFactory.CreateEquippedVisual(
+                ArenaEquipmentRole.Sword,
+                artCatalog,
+                weaponPivot,
+                "SwordVisual");
+            if (swordVisual == null)
+            {
+                GameObject sword = GameObject.CreatePrimitive(PrimitiveType.Cube);
+                sword.name = "Sword_Graybox";
+                sword.transform.SetParent(weaponPivot, false);
+                sword.transform.localPosition = new Vector3(0.62f, 0f, 0.50f);
+                sword.transform.localRotation = Quaternion.Euler(0f, 25f, 0f);
+                sword.transform.localScale = new Vector3(0.12f, 0.12f, 1.35f);
+                Object.DestroyImmediate(sword.GetComponent<Collider>());
+                sword.GetComponent<Renderer>().sharedMaterial = weaponMaterial;
+            }
 
             WorldSpaceDebugBars bars = CreateDebugBars(
                 enemy.transform,
@@ -848,7 +878,7 @@ namespace ArenaPrototype.Editor
                 definition,
                 player,
                 playerHealth,
-                weaponPivot.transform,
+                weaponPivot,
                 characterVisual,
                 bars,
                 waveMember);
@@ -889,27 +919,46 @@ namespace ArenaPrototype.Editor
                 enemy.transform,
                 bodyMaterial);
 
-            GameObject bowRoot = new GameObject("BowRoot");
-            bowRoot.transform.SetParent(enemy.transform, false);
-            bowRoot.transform.localPosition = new Vector3(0.48f, 1.05f, 0.30f);
+            Transform bowRoot = ArenaVisualFactory.CreateEquipmentPivot(
+                "BowRoot",
+                characterVisual,
+                enemy.transform,
+                true,
+                new Vector3(0.48f, 1.05f, 0.30f));
 
-            GameObject bow = GameObject.CreatePrimitive(PrimitiveType.Cube);
-            bow.name = "Bow";
-            bow.transform.SetParent(bowRoot.transform, false);
-            bow.transform.localScale = new Vector3(0.85f, 0.08f, 0.08f);
-            Object.DestroyImmediate(bow.GetComponent<Collider>());
-            bow.GetComponent<Renderer>().sharedMaterial = bowMaterial;
+            EquipmentVisual bowVisual = ArenaVisualFactory.CreateEquippedVisual(
+                ArenaEquipmentRole.Bow,
+                artCatalog,
+                bowRoot,
+                "BowVisual");
+            if (bowVisual == null)
+            {
+                GameObject bow = GameObject.CreatePrimitive(PrimitiveType.Cube);
+                bow.name = "Bow_Graybox";
+                bow.transform.SetParent(bowRoot, false);
+                bow.transform.localScale = new Vector3(0.85f, 0.08f, 0.08f);
+                Object.DestroyImmediate(bow.GetComponent<Collider>());
+                bow.GetComponent<Renderer>().sharedMaterial = bowMaterial;
+            }
 
-            GameObject nockedArrow = GameObject.CreatePrimitive(PrimitiveType.Cube);
-            nockedArrow.name = "NockedArrow";
-            nockedArrow.transform.SetParent(bowRoot.transform, false);
-            nockedArrow.transform.localPosition = new Vector3(0f, 0f, 0.38f);
-            nockedArrow.transform.localScale = new Vector3(0.06f, 0.06f, 0.82f);
-            Object.DestroyImmediate(nockedArrow.GetComponent<Collider>());
-            nockedArrow.GetComponent<Renderer>().sharedMaterial = projectileMaterial;
+            EquipmentVisual nockedArrowVisual = ArenaVisualFactory.CreateEquippedVisual(
+                ArenaEquipmentRole.Arrow,
+                artCatalog,
+                bowRoot,
+                "NockedArrowVisual");
+            if (nockedArrowVisual == null)
+            {
+                GameObject nockedArrow = GameObject.CreatePrimitive(PrimitiveType.Cube);
+                nockedArrow.name = "NockedArrow_Graybox";
+                nockedArrow.transform.SetParent(bowRoot, false);
+                nockedArrow.transform.localPosition = new Vector3(0f, 0f, 0.38f);
+                nockedArrow.transform.localScale = new Vector3(0.06f, 0.06f, 0.82f);
+                Object.DestroyImmediate(nockedArrow.GetComponent<Collider>());
+                nockedArrow.GetComponent<Renderer>().sharedMaterial = projectileMaterial;
+            }
 
             GameObject muzzle = new GameObject("Muzzle");
-            muzzle.transform.SetParent(bowRoot.transform, false);
+            muzzle.transform.SetParent(bowRoot, false);
             muzzle.transform.localPosition = new Vector3(0f, 0f, 0.82f);
 
             WorldSpaceDebugBars bars = CreateDebugBars(
@@ -938,6 +987,9 @@ namespace ArenaPrototype.Editor
                 bars,
                 aimLine,
                 projectileMaterial,
+                artCatalog != null
+                    ? artCatalog.GetEquipmentProfile(ArenaEquipmentRole.Arrow)
+                    : null,
                 waveMember);
             return waveMember;
         }
@@ -945,16 +997,38 @@ namespace ArenaPrototype.Editor
         private static void AddShieldToSwordEnemy(
             EnemyWaveMember waveMember,
             ShieldDefinition shieldDefinition,
-            Material shieldMaterial)
+            Material shieldMaterial,
+            ArenaArtCatalog artCatalog)
         {
-            GameObject shield = GameObject.CreatePrimitive(PrimitiveType.Cube);
-            shield.name = "Shield";
-            shield.transform.SetParent(waveMember.transform, false);
-            shield.transform.localPosition = new Vector3(0f, 1f, 0.66f);
-            shield.transform.localScale = new Vector3(0.92f, 1.25f, 0.14f);
-            Object.DestroyImmediate(shield.GetComponent<Collider>());
-            Renderer shieldRenderer = shield.GetComponent<Renderer>();
-            shieldRenderer.sharedMaterial = shieldMaterial;
+            CharacterVisual characterVisual = waveMember.GetComponentInChildren<CharacterVisual>(true);
+            Transform shieldPivot = ArenaVisualFactory.CreateEquipmentPivot(
+                "ShieldPivot",
+                characterVisual,
+                waveMember.transform,
+                true,
+                new Vector3(0f, 1f, 0f));
+            EquipmentVisual shieldVisual = ArenaVisualFactory.CreateEquippedVisual(
+                ArenaEquipmentRole.Shield,
+                artCatalog,
+                shieldPivot,
+                "ShieldVisual");
+
+            Renderer shieldRenderer;
+            if (shieldVisual != null)
+            {
+                shieldRenderer = shieldVisual.PrimaryRenderer;
+            }
+            else
+            {
+                GameObject shield = GameObject.CreatePrimitive(PrimitiveType.Cube);
+                shield.name = "Shield_Graybox";
+                shield.transform.SetParent(shieldPivot, false);
+                shield.transform.localPosition = new Vector3(0f, 0f, 0.66f);
+                shield.transform.localScale = new Vector3(0.92f, 1.25f, 0.14f);
+                Object.DestroyImmediate(shield.GetComponent<Collider>());
+                shieldRenderer = shield.GetComponent<Renderer>();
+                shieldRenderer.sharedMaterial = shieldMaterial;
+            }
 
             SwordEnemy swordEnemy = waveMember.GetComponent<SwordEnemy>();
             swordEnemy.ConfigureShield(shieldDefinition, shieldRenderer);
@@ -965,7 +1039,8 @@ namespace ArenaPrototype.Editor
             WeaponDefinition weaponDefinition,
             Material weaponMaterial,
             Material pickupIndicatorMaterial,
-            WeaponDropRegistry registry)
+            WeaponDropRegistry registry,
+            ArenaArtCatalog artCatalog)
         {
             EnemyWeaponDrop drop = waveMember.gameObject.AddComponent<EnemyWeaponDrop>();
             drop.Configure(
@@ -973,7 +1048,8 @@ namespace ArenaPrototype.Editor
                 weaponDefinition,
                 weaponMaterial,
                 pickupIndicatorMaterial,
-                registry);
+                registry,
+                artCatalog);
         }
 
         private static void CreateTrainingDummy(

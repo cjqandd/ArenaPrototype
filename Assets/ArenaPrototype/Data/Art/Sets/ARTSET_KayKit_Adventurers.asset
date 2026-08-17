@@ -9,12 +9,17 @@ MonoBehaviour:
   m_GameObject: {fileID: 0}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: cccbe87a5a4720441b6ce59eeb910409, type: 3}
-  m_Name: ArenaArtCatalog
-  m_EditorClassIdentifier: Assembly-CSharp::ArenaPrototype.Art.ArenaArtCatalog
-  activeArtSet: {fileID: 11400000, guid: caba136cf6c0f0c41b13df264d900eb0, type: 2}
-  fallbackArtSet: {fileID: 11400000, guid: 8bcefcbf0591e8a4588df537a17c0415, type: 2}
+  m_Script: {fileID: 11500000, guid: 034905a035fea884280ea4ec7208959b, type: 3}
+  m_Name: ARTSET_KayKit_Adventurers
+  m_EditorClassIdentifier: Assembly-CSharp::ArenaPrototype.Art.ArenaArtSet
+  displayName: KayKit Adventurers
+  proceduralGraybox: 0
   playerPrefab: {fileID: 4395150498597267750, guid: 0f03dfd1c8d38b644b42982fc6e5b276, type: 3}
   swordsmanPrefab: {fileID: 6956663753979358030, guid: 14763d16b811cd640aa6b7b7ba8c1e0c, type: 3}
   archerPrefab: {fileID: 6339603407493576976, guid: 839f083632c795a4e9d6f19e264a673e, type: 3}
   shieldBearerPrefab: {fileID: 1758314399583767044, guid: c7040b0b2a47e1c4284b68a9d85f0406, type: 3}
+  sword: {fileID: 11400000, guid: 2c7ef85ed38dedb4f8834ec929bfc5a4, type: 2}
+  chainBlade: {fileID: 0}
+  bow: {fileID: 11400000, guid: ceb92eb6879f5bf4584b871a128380b5, type: 2}
+  arrow: {fileID: 11400000, guid: 0c242e14f8f18fd4cb7efa258765910c, type: 2}
+  shield: {fileID: 11400000, guid: 331d99b7f2c230e42acd633dd8071793, type: 2}

@@ -124,14 +124,15 @@ FONT_MainChinese
 
 ## 8. 灰盒到正式美术的替换边界
 
-现在不立即写“美术资源管理器”，因为目前只有灰盒一套实现。等第一批正式角色或武器进入项目后，再增加一个 `ArenaArtCatalog` 配置资源：
+第一套正式资源进入项目后，替换边界已经落地：
 
-- 灰盒目录提供一套角色、武器、特效和字体引用。
-- 正式美术目录提供同样的一套引用。
-- 场景生成和角色创建只读取当前目录配置。
-- 移动、攻击、喝彩、掉落和场次逻辑不认识具体模型，也不引用第三方包。
+- `ArenaArtCatalog` 只保存“当前套装”和“后备套装”。
+- `ArenaArtSet` 保存玩家、剑士、弓箭手、盾兵及各类装备槽。
+- `EquipmentVisualProfile` 保存武器模型、大小、手持姿态、落地姿态和拾取碰撞范围。
+- KayKit 与程序灰盒是同一接口下的两套实现；正式槽为空时可回退到灰盒。
+- 移动、攻击、喝彩、掉落、箭矢和场次逻辑只读取统一视觉配置，不直接引用第三方原包。
 
-届时灰盒和正式美术是同一接口的两套真实实现，才能形成有价值的替换边界；现在提前写只会增加无用配置。
+非技术操作统一从 Unity 顶部菜单 `Arena Prototype > 美术资源 > 打开美术资源管理器` 进入。角色直接更换身份预制体；武器先从视觉预制体创建装备配置，再调整姿态并放入对应槽。最后点击“验证当前套装”和“重建场景并应用”。详细步骤见 `ART_REPLACEMENT_GUIDE.md`。
 
 ## 9. 资源台账
 
@@ -139,13 +140,14 @@ FONT_MainChinese
 
 | 资源 | 来源/订单 | 许可凭证 | 版本与格式 | 原包位置 | 项目适配位置 | 状态 | 备注 |
 | --- | --- | --- | --- | --- | --- | --- | --- |
-| KayKit - Character Pack: Adventurers（FREE） | [itch.io 商品页](https://kaylousberg.itch.io/kaykit-adventurers)；免费版 | `ExternalAssets/Licenses/KayKit_Adventurers_2.0_FREE_LICENSE.txt`；CC0 1.0，可商用且无需署名 | Free 2.0；FBX 7.4、glTF/GLB、OBJ；12.42 MiB；SHA256 `ABE48F4763FBA0896BAB486EE9E6D08CA6B5B3884B9601F235C8847AE94DC479` | 压缩包：`ExternalAssets/Incoming/KayKit_Adventurers_2.0_FREE.zip`；已筛选 FBX 原包：`Assets/ThirdParty/KayKit/Adventurers_2.0_FREE/` | 材质：`Assets/ArenaPrototype/Art/Production/Materials/KayKitAdventurers/`；通用视觉预制体：`Assets/ArenaPrototype/Prefabs/Characters/`、`Assets/ArenaPrototype/Prefabs/Weapons/`；身份预制体：`Assets/ArenaPrototype/Prefabs/Characters/Roles/`；美术目录：`Assets/ArenaPrototype/Data/Art/ArenaArtCatalog.asset` | 适配中 | Unity 6000.3.21f1 + URP 17.3.0 验证通过：6 个 Humanoid Avatar 和双手挂点有效，5 套 URP/Lit 材质、6 个通用角色和 5 个武器视觉预制体引用完整。已建立玩家（Barbarian）、剑士（Rogue）、弓箭手（Ranger）、盾兵（Knight）四个身份预制体，并将 8 个角色实例替换进 `GrayboxArena`；基础待机、行走、奔跑已接入，Root Motion 关闭，玩法数值与命中判定未改。当前仍待人工播放验收；武器、战斗动作与受击/死亡动作尚未替换。`Rig_Medium_General.fbx` 导入时会触发 Unity FBX 曲线 `IsFinite` 断言，但导入后逐条检查未发现非有限时间/数值关键帧。没有战斗动画和链刃资源 |
+| KayKit - Character Pack: Adventurers（FREE） | [itch.io 商品页](https://kaylousberg.itch.io/kaykit-adventurers)；免费版 | `ExternalAssets/Licenses/KayKit_Adventurers_2.0_FREE_LICENSE.txt`；CC0 1.0，可商用且无需署名 | Free 2.0；FBX 7.4、glTF/GLB、OBJ；12.42 MiB；SHA256 `ABE48F4763FBA0896BAB486EE9E6D08CA6B5B3884B9601F235C8847AE94DC479` | 压缩包：`ExternalAssets/Incoming/KayKit_Adventurers_2.0_FREE.zip`；已筛选 FBX 原包：`Assets/ThirdParty/KayKit/Adventurers_2.0_FREE/` | 材质：`Assets/ArenaPrototype/Art/Production/Materials/KayKitAdventurers/`；通用视觉预制体：`Assets/ArenaPrototype/Prefabs/Characters/`、`Assets/ArenaPrototype/Prefabs/Weapons/`；身份预制体：`Assets/ArenaPrototype/Prefabs/Characters/Roles/`；Art Set：`Assets/ArenaPrototype/Data/Art/Sets/`；装备配置：`Assets/ArenaPrototype/Data/Art/Profiles/Equipment/` | 已投入使用 | Unity 6000.3.21f1 + URP 17.3.0 验证通过。玩家（Barbarian）、剑士（Rogue）、弓箭手（Ranger）、盾兵（Knight）共 8 个角色实例已接入；基础待机、行走、奔跑已接入，Root Motion 关闭。KayKit 单手剑、弓、箭和圆盾已通过统一装备配置接入；场景验收为 6 剑、2 弓、2 搭弦箭、2 盾，运行无新增错误。链刃因原包没有对应资源继续使用灰盒。玩法数值和命中判定未改；战斗、受击、死亡动作仍待替换。`Rig_Medium_General.fbx` 导入时会触发 Unity FBX 曲线 `IsFinite` 断言，但导入后逐条检查未发现非有限时间/数值关键帧。 |
 
 状态统一使用：`待评估`、`测试工程通过`、`已导入原包`、`适配中`、`已投入使用`、`已停用`。
 
 ## 10. 当前决定
 
 - 当前灰盒资源和自动生成场景不移动。
+- 当前正式套装使用 `ARTSET_KayKit_Adventurers`，后备套装使用 `ARTSET_Graybox`。
+- 角色与武器后续统一通过美术资源管理器更换，不直接改战斗脚本。
 - 界面临时使用 Windows 系统中文字体回退；正式发布前必须导入一款许可明确、包含所需中文字形的项目字体。
-- 在第一件真实资源到来前，不建立多余的美术抽象层。
 - 用户购买前可以先给商品信息；购买后优先检查本地文件，再决定是否导入主项目。

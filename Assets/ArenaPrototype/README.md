@@ -2,6 +2,10 @@
 
 美术资源的购买、检查、导入、目录和灰盒替换方案见 `Assets/ArenaPrototype/ART_ASSET_MANAGEMENT.md`。
 
+角色和武器已使用 Art Set 管理。以后自行替换资源时，打开 Unity 顶部菜单 `Arena Prototype > 美术资源 > 打开美术资源管理器`；完整操作见 `Assets/ArenaPrototype/ART_REPLACEMENT_GUIDE.md`。
+
+当前套装为 KayKit Adventurers：玩家、剑士、弓箭手、盾兵，以及剑、弓、箭、盾已接入；原包没有链刃，链刃继续使用灰盒后备外观。
+
 当前灰盒里程碑已经覆盖第一至第四阶段：三场竞技场闭环、动作取消规则、喝彩战斗收益、敌人攻击协调、场间强化和功能界面。
 
 最新验收步骤见 `Assets/ArenaPrototype/STAGE2_4_PLAYTEST.md`，原始需求对照与完成状态见 `Assets/ArenaPrototype/PROJECT_STATUS.md`。

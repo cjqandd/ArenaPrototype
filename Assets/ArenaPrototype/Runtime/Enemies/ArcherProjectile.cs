@@ -1,4 +1,5 @@
 using ArenaPrototype.Combat;
+using ArenaPrototype.Art;
 using UnityEngine;
 
 namespace ArenaPrototype.Enemies
@@ -19,6 +20,7 @@ namespace ArenaPrototype.Enemies
             Vector3 position,
             Vector3 newDirection,
             Material material,
+            EquipmentVisualProfile visualProfile,
             GameObject newOwner,
             float newSpeed,
             float lifetime,
@@ -26,14 +28,24 @@ namespace ArenaPrototype.Enemies
             float newHealthDamage,
             float newKnockbackSpeed)
         {
-            GameObject arrow = GameObject.CreatePrimitive(PrimitiveType.Cube);
+            GameObject arrow = new GameObject("ArcherProjectile");
             arrow.name = "ArcherProjectile";
             arrow.transform.SetPositionAndRotation(
                 position,
                 Quaternion.LookRotation(newDirection, Vector3.up));
-            arrow.transform.localScale = new Vector3(0.08f, 0.08f, 0.75f);
-            Destroy(arrow.GetComponent<Collider>());
-            arrow.GetComponent<Renderer>().sharedMaterial = material;
+
+            GameObject productionModel = ArenaVisualFactory.InstantiateProjectileModel(
+                visualProfile,
+                arrow.transform);
+            if (productionModel == null)
+            {
+                GameObject grayboxModel = GameObject.CreatePrimitive(PrimitiveType.Cube);
+                grayboxModel.name = "Visual_Graybox";
+                grayboxModel.transform.SetParent(arrow.transform, false);
+                grayboxModel.transform.localScale = new Vector3(0.08f, 0.08f, 0.75f);
+                Destroy(grayboxModel.GetComponent<Collider>());
+                grayboxModel.GetComponent<Renderer>().sharedMaterial = material;
+            }
 
             ArcherProjectile projectile = arrow.AddComponent<ArcherProjectile>();
             projectile.owner = newOwner;
